@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "410639759029",
+    "firebase_url": "https://dbmxh-1c01c-default-rtdb.firebaseio.com",
+    "project_id": "dbmxh-1c01c",
+    "storage_bucket": "dbmxh-1c01c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:410639759029:android:df2d84497c0e273c1ef0fc",
+        "android_client_info": {
+          "package_name": "com.example.SocialMedia1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "410639759029-f574ut5fk9t8veo5m9mr6ndj303albqb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEK4uj0YWq9rjS2YAGiUN3L3iERfMeDSc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "410639759029-f574ut5fk9t8veo5m9mr6ndj303albqb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
