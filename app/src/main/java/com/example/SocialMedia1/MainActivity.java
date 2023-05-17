@@ -125,47 +125,6 @@ public class MainActivity extends AppCompatActivity {
                             Log.e("Error " , t.getMessage());
                         }
                     });
-//                    auth.createUserWithEmailAndPassword(e,p).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<AuthResult> task) {
-//                            if (task.isSuccessful())
-//                            {
-//                              ;
-//
-//                                auth=FirebaseAuth.getInstance();
-//                                user=auth.getCurrentUser();
-//
-//                                HashMap<String,Object> map=new HashMap<>();
-//                                map.put("username",n);
-//                                map.put("user_id",user.getUid());
-//                                map.put("memer","@"+m);
-//                                map.put("email",e);
-//                                map.put("profileUrl",profile);
-//                                map.put("background",url);
-//                                map.put("password",p);
-//                                reference.child(user.getUid()).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                    @Override
-//                                    public void onComplete(@NonNull Task<Void> task) {
-//                                        if (task.isSuccessful())
-//                                        {
-//                                            startActivity(new Intent(MainActivity.this,Login.class));
-//                                            Toast.makeText(MainActivity.this, "Account created!!!", Toast.LENGTH_SHORT).show();
-//                                            progressDialog.dismiss();
-//                                        }else
-//                                        {
-//                                            progressDialog.dismiss();
-//                                            Toast.makeText(MainActivity.this, "Something went wrong "+task.getException(), Toast.LENGTH_SHORT).show();
-//                                        }
-//                                    }
-//                                });
-//
-//                            }else
-//                            {
-//                                progressDialog.dismiss();
-//                                Toast.makeText(MainActivity.this, "Unable to register.."+task.getException(), Toast.LENGTH_SHORT).show();
-//                            }
-//                        }
-//                    });
                 }
 
 

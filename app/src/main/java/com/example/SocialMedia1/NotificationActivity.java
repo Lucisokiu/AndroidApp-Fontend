@@ -81,10 +81,6 @@ public class NotificationActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Notifications>> call, Response<List<Notifications>> response) {
                 list.addAll(response.body());
-//                for( Notifications notifications : response.body())
-//                {
-//                    list.add(notifications);
-//                }
                 Collections.reverse(list);
                 adapter.notifyDataSetChanged();
             }
@@ -96,29 +92,4 @@ public class NotificationActivity extends AppCompatActivity {
         });
     }
 
-//    private void readNotifications() {
-//
-//        FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
-//        DatabaseReference reference= FirebaseDatabase.getInstance().getReference().child("Notifications")
-//                .child(firebaseUser.getUid());
-//
-//        reference.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                list.clear();
-//                for (DataSnapshot dataSnapshot : snapshot.getChildren())
-//                {
-//                    Notifications notifications=dataSnapshot.getValue(Notifications.class);
-//                    list.add(notifications);
-//                }
-//                Collections.reverse(list);
-//                adapter.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//    }
 }

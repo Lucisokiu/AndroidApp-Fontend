@@ -60,11 +60,7 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-
-//        FirebaseApp.initializeApp(Login.this);
         init();
-//        auth=FirebaseAuth.getInstance();
-//        user=auth.getCurrentUser();
 
         networkUtil = new NetworkUtil();
         retrofit = networkUtil.getRetrofit();

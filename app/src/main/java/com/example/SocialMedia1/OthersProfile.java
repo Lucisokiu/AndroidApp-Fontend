@@ -83,12 +83,6 @@ public class OthersProfile extends AppCompatActivity {
 
 
         init();
-//        auth=FirebaseAuth.getInstance();
-//        user=auth.getCurrentUser();
-//        reference= FirebaseDatabase.getInstance().getReference().child("Users");
-//        storageReference= FirebaseStorage.getInstance().getReference().child("Profiles");
-//        bgRef= FirebaseStorage.getInstance().getReference().child("Backgrounds");
-//
         toolbar=findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

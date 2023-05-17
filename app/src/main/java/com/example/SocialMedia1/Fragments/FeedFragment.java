@@ -55,25 +55,16 @@ public class FeedFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_feed, container, false);
 
-//        //API
-//        NetworkUtil networkUtil = new NetworkUtil();
-//        Retrofit retrofit = networkUtil.getRetrofit();
-//        InterfaceAPI interfaceAPI = retrofit.create(InterfaceAPI.class);
-
 
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-//        auth = FirebaseAuth.getInstance();
-//        user = auth.getCurrentUser();
 
         SharedPreferences preferences = getActivity().getSharedPreferences("PREFS", MODE_PRIVATE);
         profileid = preferences.getString("uid","");
         Log.d("uid_feed", profileid);
 
-//        reference = FirebaseDatabase.getInstance().getReference().child("Users");
-//        postRef = FirebaseDatabase.getInstance().getReference().child("Posts");
 
 
         postsList = new ArrayList<>();

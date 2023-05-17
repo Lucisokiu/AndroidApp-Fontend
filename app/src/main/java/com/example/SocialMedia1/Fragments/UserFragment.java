@@ -199,7 +199,7 @@ public class UserFragment extends Fragment {
         profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CheckPermission_forProfile();
+//                CheckPermission_forProfile();
                 Intent intent=new Intent(Intent.ACTION_PICK);
                 intent.setType("image/*");
                 startActivityForResult(intent,1);
@@ -209,7 +209,7 @@ public class UserFragment extends Fragment {
         bg_camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CheckPermission_forBg();
+//                CheckPermission_forBg();
                     Intent intent=new Intent(Intent.ACTION_PICK);
                     intent.setType("image/*");
                     startActivityForResult(intent,2);
@@ -242,6 +242,7 @@ public class UserFragment extends Fragment {
         {
             profileUri=data.getData();
             profile.setImageURI(profileUri);
+            profile.setScaleType(ImageView.ScaleType.CENTER_CROP);
             btn_update.setVisibility(View.VISIBLE);
 
         }else if (requestCode==2 && resultCode==RESULT_OK && data !=null)
@@ -263,9 +264,6 @@ public class UserFragment extends Fragment {
             if (profileUri !=null) {
                 // Tạo request body với định dạng form data
                 RealpostUriProfile = RealPathUtil.getRealPath(getContext(), profileUri);
-//                File imageFile = new File(RealpostUri);
-//                Log.d("profileUri.getPath()",profileUri.getPath());
-//                Log.d("profileUri.getPath()",profileUri.getPath().replace("/raw", ""));
                 File imageFile = new File(RealpostUriProfile);
 //                File imageFile = new File(profileUri.getPath());
 
@@ -294,66 +292,6 @@ public class UserFragment extends Fragment {
 
             }
     }
-//    private void uploadProfile()
-//    {
-//        if (profileUri !=null)
-//        {
-//            pd.setTitle("Profile Picture");
-//            pd.setCanceledOnTouchOutside(false);
-//            pd.show();
-//            final StorageReference sRef=storageReference.child(user.getUid()+"."+getFileExtension(profileUri));
-//            sRef.putFile(profileUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//                @Override
-
-//                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                    sRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//                        @Override
-//                        public void onSuccess(Uri uri) {
-//                            String profileUrl=uri.toString();
-//
-//                            HashMap<String,Object> map=new HashMap<>();
-//                            map.put("profileUrl",profileUrl);
-//
-//
-//                            reference.child(user.getUid()).updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                @Override
-//                                public void onComplete(@NonNull Task<Void> task) {
-//                                    if (task.isSuccessful())
-//                                    {
-//                                        pd.dismiss();
-//                                        Toast.makeText(getContext(), "Profiled updated", Toast.LENGTH_SHORT).show();
-//                                        btn_update.setVisibility(View.GONE);
-//                                    }else
-//                                    {
-//                                        pd.dismiss();
-//                                        btn_update.setVisibility(View.VISIBLE);
-//                                        Toast.makeText(getContext(), "Something went wrong!!", Toast.LENGTH_SHORT).show();
-//                                    }
-//                                }
-//                            });
-//                        }
-//                    }).addOnFailureListener(new OnFailureListener() {
-//                        @Override
-//                        public void onFailure(@NonNull Exception e) {
-//                            Toast.makeText(getContext(), "Error "+e.getMessage(), Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
-//                }
-//            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-//                @Override
-//                public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
-//                    double progress=(100*snapshot.getBytesTransferred()/snapshot.getTotalByteCount());
-//                    pd.setMessage("Updating... "+((int)progress) +"%...");
-//
-//                }
-//            });
-//
-//
-//        }else
-//        {
-//            Toast.makeText(getContext(), "No image is selected!!", Toast.LENGTH_SHORT).show();
-//        }
-//    }
 
     private void updateBackground()
     {
@@ -393,62 +331,7 @@ public class UserFragment extends Fragment {
         }
 
     }
-//    private void updateBackground()
-//    {
-//        if (bgUri !=null)
-//        {
-//            pd.setTitle("Background image");
-//            pd.setCanceledOnTouchOutside(false);
-//            pd.show();
-//            final StorageReference sRef=bgRef.child(user.getUid()+"."+getFileExtension(bgUri));
-//            sRef.putFile(bgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//                @Override
-//                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                    sRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//                        @Override
-//                        public void onSuccess(Uri uri) {
-//                            String bgUrl=uri.toString();
-//
-//                            HashMap<String,Object> map=new HashMap<>();
-//                            map.put("background",bgUrl);
-//
-//                            reference.child(user.getUid()).updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                @Override
-//                                public void onComplete(@NonNull Task<Void> task) {
-//                                    if (task.isSuccessful())
-//                                    {
-//                                        pd.dismiss();
-//                                        Toast.makeText(getContext(), "Background image updated..", Toast.LENGTH_SHORT).show();
-//                                    }else
-//                                    {
-//                                        pd.dismiss();
-//                                        Toast.makeText(getContext(), "Something went wrong!!", Toast.LENGTH_SHORT).show();
-//                                    }
-//                                }
-//                            });
-//                        }
-//                    }).addOnFailureListener(new OnFailureListener() {
-//                        @Override
-//                        public void onFailure(@NonNull Exception e) {
-//                            Toast.makeText(getContext(), "Error "+e.getMessage(), Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
-//                }
-//            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-//                @Override
-//                public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
-//                    double progress=(100*snapshot.getBytesTransferred()/snapshot.getTotalByteCount());
-//                    pd.setMessage("Updating... "+((int)progress) +"%...");
-//
-//                }
-//            });
-//
-//
-//        }else
-//        {
-//            Toast.makeText(getContext(), "No image is selected!!", Toast.LENGTH_SHORT).show();
-//        }
-//    }
+
     private void getFollowCount()
     {
             Call<List<FollowingModel>> followingModelCall = interfaceAPI.getFollowing(profileid);
@@ -488,86 +371,9 @@ public class UserFragment extends Fragment {
             public void onFailure(Call<List<FollowerModel>> call, Throwable t) {
 
             }
-            //     đếm số lượng bài đăng -> chuyển xuống getImage để mỗi khi lấy bài post sẽ đếm luôn số lượng. khỏi phải call API 2 lần
-            //        => tăng hiệu suất
         });
-        //        Call<List<Posts>> callPost = interfaceAPI.getPost();
-//        callPost.enqueue(new Callback<List<Posts>>() {
-//            @Override
-//            public void onResponse(Call<List<Posts>> call, Response<List<Posts>> response) {
-//                int i = 0;
-//                for(Posts post : response.body())
-//                {
-//                    if (post.getPublisher().equals(profileid))
-//                    {
-//                        i++;
-//                    }
-//                }
-//
-//            }
-//
-//            @Override
-//            public void onFailure(Call<List<Posts>> call, Throwable t) {
-//
-//            }
-//        });
+
     }
-//    private void getFollowCount()
-//    {
-//        DatabaseReference databaseReference=FirebaseDatabase.getInstance().getReference().child("Follow")
-//                .child(user.getUid()).child("followers");
-//        databaseReference.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                followers_count.setText(""+snapshot.getChildrenCount());
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//                Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//        DatabaseReference databaseReference1=FirebaseDatabase.getInstance().getReference().child("Follow")
-//                .child(user.getUid()).child("following");
-//        databaseReference1.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                following_count.setText(""+snapshot.getChildrenCount());
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//                Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//        DatabaseReference postCount=FirebaseDatabase.getInstance().getReference().child("Posts");
-//        postCount.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                int i=0;
-//
-//                for (DataSnapshot dataSnapshot : snapshot.getChildren())
-//                {
-//                    String p=dataSnapshot.child("publisher").getValue().toString();
-//                    if (p.equals(user.getUid()))
-//                    {
-//                        i++;
-//                    }
-//                }
-//                pos_count.setText("Posts "+"("+i+")");
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//                Toast.makeText(getActivity(), "Error "+error.getMessage(), Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//
-//    }
 
     private void getUserData()
     {
@@ -592,6 +398,7 @@ public class UserFragment extends Fragment {
 
 
                 Glide.with(getActivity()).load(p).centerCrop().placeholder(R.drawable.profile_image).into(profile);
+
             }
 
             @Override
@@ -600,38 +407,6 @@ public class UserFragment extends Fragment {
             }
         });
     }
-//    private void getUserData()
-//    {
-//
-//        reference.child(user.getUid()).addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//
-//                String n=snapshot.child("username").getValue().toString();
-//                String m=snapshot.child("memer").getValue().toString();
-//                String p=snapshot.child("profileUrl").getValue().toString();
-//                String b=snapshot.child("background").getValue().toString();
-//
-//
-//                username.setText(n);
-//                memer.setText(m);
-//                Picasso.get().load(p).placeholder(R.drawable.profile_image).into(profile);
-//                Picasso.get().load(b).into(bg);
-//
-//
-////                Glide.with(getActivity()).load(p).centerCrop().placeholder(R.drawable.profile_image).into(profile);
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//                Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-//
-//            }
-//        });
-//
-//    }
-
 
     public String getFileExtension(Uri uri) {
         ContentResolver contentResolver = getContext().getContentResolver();
@@ -648,12 +423,6 @@ public class UserFragment extends Fragment {
         }
     }
 
-//    public String getFileExtension(Uri uri)
-//    {
-//        ContentResolver contentResolver= getContext().getContentResolver();
-//        MimeTypeMap map=MimeTypeMap.getSingleton();
-//        return map.getMimeTypeFromExtension(contentResolver.getType(uri));
-//    }
     private void init(View view)
     {
         settings=view.findViewById(R.id.settings);
@@ -706,33 +475,6 @@ public class UserFragment extends Fragment {
         });
     }
 
-//    private void getImages()
-//    {
-//        DatabaseReference databaseReference=FirebaseDatabase.getInstance().getReference().child("Posts");
-//        databaseReference.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                postsList.clear();
-//                for (DataSnapshot dataSnapshot : snapshot.getChildren())
-//                {
-//                    Posts posts=dataSnapshot.getValue(Posts.class);
-//                    if (posts.getPublisher().equals(user.getUid()))
-//                    {
-//                        postsList.add(posts);
-//                    }
-//                }
-//                Collections.reverse(postsList);
-//                adapter.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//                Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//    }
 
 
     public static String[] storge_permissions = {

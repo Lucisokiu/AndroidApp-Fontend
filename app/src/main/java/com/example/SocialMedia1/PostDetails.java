@@ -82,28 +82,4 @@ public class PostDetails extends AppCompatActivity {
 }
 
 
-//    private void readPosts() {
-//        DatabaseReference reference= FirebaseDatabase.getInstance().getReference().child("Posts")
-//                .child(postid);
-//
-//        reference.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                postsList.clear();
-//                Posts posts=snapshot.getValue(Posts.class);
-//
-//                postsList.add(posts);
-//
-//                adapter.notifyDataSetChanged();
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//                Toast.makeText(PostDetails.this, "error", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//    }
 }

@@ -46,15 +46,6 @@ public class HomeActivity extends AppCompatActivity {
         user=auth.getCurrentUser();
 
 
-//        Intent intent = getIntent();
-//        String uid_intent = intent.getStringExtra("uid");
-//        Log.d("uid", uid_intent);
-//
-//
-//        Bundle bundle = new Bundle();
-//        bundle.putString("uid", uid_intent);
-
-
 
 
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -83,9 +74,6 @@ public class HomeActivity extends AppCompatActivity {
                     fragmentTransaction.replace(R.id.frameLayout, userFragment);
                     fragmentTransaction.commit();
 
-//                    SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
-//                    editor.putString("profileid", uid_intent);
-//                    editor.apply();
                 }
                 return true;
             }
