@@ -18,11 +18,7 @@ import com.example.SocialMedia1.Model.Data;
 import com.example.SocialMedia1.Model.FollowerModel;
 import com.example.SocialMedia1.Model.FollowingModel;
 import com.example.SocialMedia1.Retrofit.NetworkUtil;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,15 +80,15 @@ public class ShowList extends AppCompatActivity {
 
         list=new ArrayList<>();
 
-//        switch (title)
-//        {
-//            case "Followers":
-//                getFollowers();
-//                break;
-//            case "Following":
-//                getFollowing();
-//                break;
-//        }
+        switch (title)
+        {
+            case "Followers":
+                getFollowers();
+                break;
+            case "Following":
+                getFollowing();
+                break;
+        }
 
         showUsers();
 
@@ -142,74 +138,6 @@ public class ShowList extends AppCompatActivity {
 
     }
 
-//    private void getFollowers() {
-//
-//
-//        DatabaseReference reference= FirebaseDatabase.getInstance().getReference().child("Follow")
-//                .child(id).child("followers");
-//
-//        reference.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                list.clear();
-//                for (DataSnapshot dataSnapshot : snapshot.getChildren())
-//                {
-//                    list.add(dataSnapshot.getKey());
-//                }
-//                showUsers();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//                Toast.makeText(ShowList.this, "Error loading..", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//
-//
-//
-//
-//
-//
-//
-//    }
-
-
-
-//    private void getFollowing() {
-//
-//
-//        DatabaseReference reference= FirebaseDatabase.getInstance().getReference().child("Follow")
-//                .child(id).child("following");
-//
-//        reference.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                list.clear();
-//                for (DataSnapshot dataSnapshot : snapshot.getChildren())
-//                {
-//                    list.add(dataSnapshot.getKey());
-//                }
-//                showUsers();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//                Toast.makeText(ShowList.this, "Error loading..", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//
-//
-//
-//
-//
-//
-//
-//    }
-
 
 
     private void showUsers()
@@ -237,31 +165,4 @@ public class ShowList extends AppCompatActivity {
             }
         });
     }
-//    private void showUsers()
-//    {
-//        DatabaseReference reference=FirebaseDatabase.getInstance().getReference().child("Users");
-//        reference.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                data.clear();
-//                for (DataSnapshot dataSnapshot : snapshot.getChildren())
-//                {
-//                    Data user=dataSnapshot.getValue(Data.class);
-//                    for (String id : list)
-//                    {
-//                        if (user.getUser_id().equals(id))
-//                        {
-//                            data.add(user);
-//                        }
-//                    }
-//                }
-//                adapter.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//    }
 }

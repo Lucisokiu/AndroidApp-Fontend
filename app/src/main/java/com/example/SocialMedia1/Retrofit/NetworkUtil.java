@@ -2,7 +2,11 @@ package com.example.SocialMedia1.Retrofit;
 
 import static com.example.SocialMedia1.Utils.Constants.BASE_URL;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import SocialMedia1.BuildConfig;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -20,6 +24,7 @@ public class NetworkUtil {
         }
 
         if(retrofit == null) {
+
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())

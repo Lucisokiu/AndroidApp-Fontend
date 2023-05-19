@@ -7,23 +7,21 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.example.SocialMedia1.API.InterfaceAPI;
 import com.example.SocialMedia1.Adapter.CommentAdapter;
 import com.example.SocialMedia1.Model.Comment;
 import com.example.SocialMedia1.Model.Data;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.example.SocialMedia1.Retrofit.NetworkUtil;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -34,6 +32,10 @@ import java.util.List;
 
 import SocialMedia1.R;
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class CommentActivity extends AppCompatActivity {
 
@@ -48,43 +50,41 @@ public class CommentActivity extends AppCompatActivity {
     CommentAdapter adapter;
 
 
-    FirebaseAuth auth;
-    FirebaseUser user;
-    DatabaseReference reference;
-
     String postid;
     String publisher;
+    String profileid;
 
+    NetworkUtil networkUtil = new NetworkUtil();
+    Retrofit retrofit = networkUtil.getRetrofit();
+    InterfaceAPI interfaceAPI = retrofit.create(InterfaceAPI.class);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
 
-        profile=findViewById(R.id.profile_image);
-        edit_comment=findViewById(R.id.comment_edit);
-        send=findViewById(R.id.send);
-        no=findViewById(R.id.no);
-        toolbar=findViewById(R.id.toolbar);
+        profile = findViewById(R.id.profile_image);
+        edit_comment = findViewById(R.id.comment_edit);
+        send = findViewById(R.id.send);
+        no = findViewById(R.id.no);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        auth=FirebaseAuth.getInstance();
-        user=auth.getCurrentUser();
-        reference=FirebaseDatabase.getInstance().getReference().child("Users");
 
+        Intent intent = getIntent();
+        postid = intent.getStringExtra("postid");
+        publisher = intent.getStringExtra("publisher");
+        SharedPreferences preferences = getSharedPreferences("PREFS", MODE_PRIVATE);
+        profileid = preferences.getString("profileid","");
 
-        Intent intent=getIntent();
-        postid=intent.getStringExtra("postid");
-        publisher=intent.getStringExtra("publisher");
-
-        recyclerView=findViewById(R.id.recyclerView);
+        recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
 
 
-        commentList=new ArrayList<>();
-        adapter=new CommentAdapter(this,commentList);
+        commentList = new ArrayList<>();
+        adapter = new CommentAdapter(this, commentList);
 
         getComments();
 
@@ -94,97 +94,103 @@ public class CommentActivity extends AppCompatActivity {
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (edit_comment.getText().toString().isEmpty())
-                {
+                if (edit_comment.getText().toString().isEmpty()) {
                     Toast.makeText(CommentActivity.this, "Comment can't be empty", Toast.LENGTH_SHORT).show();
-                }else
-                {
+                } else {
                     addComment();
                 }
             }
         });
 
 
-
     }
 
     private void getComments() {
-        DatabaseReference databaseReference=FirebaseDatabase.getInstance().getReference().child("Comments")
-                .child(postid);
-
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        Call<List<Comment>> call = interfaceAPI.getComments(postid);
+        call.enqueue(new Callback<List<Comment>>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists())
+            public void onResponse(Call<List<Comment>> call, Response<List<Comment>> response) {
+                if (response.isSuccessful())
                 {
                     commentList.clear();
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren())
-                    {
-                        Comment comment=dataSnapshot.getValue(Comment.class);
-                        commentList.add(comment);
-                    }
+                    commentList.addAll(response.body());
                     adapter.notifyDataSetChanged();
                     no.setVisibility(View.GONE);
                 }else
                 {
                     no.setVisibility(View.VISIBLE);
                 }
-
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
+            public void onFailure(Call<List<Comment>> call, Throwable t) {
                 Toast.makeText(CommentActivity.this, "Error while load comments", Toast.LENGTH_SHORT).show();
+
             }
         });
     }
 
+
     private void addComment() {
+
         Date date=new Date();
         SimpleDateFormat format=new SimpleDateFormat("dd-M-yyyy hh:mm a");
         String currentDate=format.format(date);
-        DatabaseReference databaseReference=FirebaseDatabase.getInstance().getReference().child("Comments").child(postid);
 
-        HashMap<String,Object> map=new HashMap<>();
-        map.put("comment",edit_comment.getText().toString());
-        map.put("publisher",user.getUid());
-        map.put("time",currentDate);
-
-        databaseReference.push().setValue(map);
-        addNotifications();
-        edit_comment.setText("");
-    }
-    private void addNotifications()
-    {
-        FirebaseUser user=FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference reference=FirebaseDatabase.getInstance().getReference().child("Notifications").child(publisher);
-
-        HashMap<String,Object> map=new HashMap<>();
-
-        map.put("userid",user.getUid());
-        map.put("comment","Commented: "+edit_comment.getText().toString());
-        map.put("postid",postid);
-        map.put("ispost",true);
-
-        reference.push().setValue(map);
-    }
-    private void getImage()
-    {
-        reference.child(user.getUid()).addValueEventListener(new ValueEventListener() {
+        Call<String> call = interfaceAPI.addComment(edit_comment.getText().toString() , publisher ,  currentDate);
+        call.enqueue(new Callback<String>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Data data=snapshot.getValue(Data.class);
+            public void onResponse(Call<String> call, Response<String> response) {
+                addNotifications();
+                edit_comment.setText("");
 
-                Picasso.get().load(data.getProfileUrl()).into(profile);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onFailure(Call<String> call, Throwable t) {
+                Toast.makeText(CommentActivity.this, "Error", Toast.LENGTH_SHORT).show();
 
             }
         });
     }
+
+
+    private void addNotifications()
+    {
+        Call<String> call = interfaceAPI.addNotifi(publisher,profileid,edit_comment.getText().toString(),postid);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Log.d("Success","OK");
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e("Throwable",t.getMessage());
+
+            }
+        });
+    }
+
+        private void getImage(){
+            Call<Data> call = interfaceAPI.getUser(profileid);
+            call.enqueue(new Callback<Data>() {
+                @Override
+                public void onResponse(Call<Data> call, Response<Data> response) {
+
+
+                Picasso.get().load(response.body().getProfileUrl()).into(profile);
+
+                }
+
+                @Override
+                public void onFailure(Call<Data> call, Throwable t) {
+                    Toast.makeText(CommentActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                }
+            });
+
 }
 
-//
+
+}

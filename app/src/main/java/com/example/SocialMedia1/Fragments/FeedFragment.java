@@ -24,9 +24,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 import com.example.SocialMedia1.Retrofit.NetworkUtil;
-import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -37,7 +37,6 @@ public class FeedFragment extends Fragment {
     PostAdapter adapter;
 
 
-    FirebaseAuth auth;
     //    FirebaseUser user;
     String profileid;
 //    DatabaseReference reference,postRef;
@@ -62,7 +61,7 @@ public class FeedFragment extends Fragment {
 
 
         SharedPreferences preferences = getActivity().getSharedPreferences("PREFS", MODE_PRIVATE);
-        profileid = preferences.getString("uid","");
+        profileid = preferences.getString("profileid","");
         Log.d("uid_feed", profileid);
 
 
@@ -88,6 +87,7 @@ public class FeedFragment extends Fragment {
 //                    postsList.add(posts);
 //                }
                 postsList.addAll(response.body());
+                Collections.reverse(postsList);
                 adapter.notifyDataSetChanged();
 
             }

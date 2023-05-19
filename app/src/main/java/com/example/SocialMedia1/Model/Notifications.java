@@ -7,7 +7,7 @@ public class Notifications {
     String userid;
     @SerializedName("comment")
     String comment;
-    @SerializedName("userid")
+    @SerializedName("postid")
     String postid;
     @SerializedName("ispost")
     boolean ispost;

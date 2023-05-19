@@ -16,8 +16,7 @@ import com.example.SocialMedia1.Fragments.FeedFragment;
 import com.example.SocialMedia1.Fragments.FollowingFragment;
 import com.example.SocialMedia1.Fragments.UserFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+
 
 import SocialMedia1.R;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -27,8 +26,6 @@ public class HomeActivity extends AppCompatActivity {
     FrameLayout frameLayout;
     BottomNavigationView bottomNavigationView;
 
-    FirebaseAuth auth;
-    FirebaseUser user;
 
     CircleImageView profile_image;
 
@@ -41,9 +38,6 @@ public class HomeActivity extends AppCompatActivity {
 
         frameLayout=findViewById(R.id.frameLayout);
         bottomNavigationView=findViewById(R.id.bottom_nav);
-
-        auth=FirebaseAuth.getInstance();
-        user=auth.getCurrentUser();
 
 
 

@@ -25,15 +25,7 @@ import com.example.SocialMedia1.Model.FollowerModel;
 import com.example.SocialMedia1.Model.FollowingModel;
 import com.example.SocialMedia1.Model.Posts;
 import com.example.SocialMedia1.Retrofit.NetworkUtil;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
+
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -64,13 +56,10 @@ public class OthersProfile extends AppCompatActivity {
     List<Posts> postsList;
     PhotosAdapter adapter;
 
-    FirebaseAuth auth;
-    FirebaseUser user;
+
     String id;
-    DatabaseReference reference;
-    StorageReference storageReference,bgRef;
-    SharedPreferences preferences=getSharedPreferences("PREFS", Context.MODE_PRIVATE);
-    String profileid=preferences.getString("profileid","");
+
+    String profileid;
 
     NetworkUtil networkUtil = new NetworkUtil();
     Retrofit retrofit = networkUtil.getRetrofit();
@@ -81,7 +70,8 @@ public class OthersProfile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-
+        SharedPreferences preferences=getSharedPreferences("PREFS", Context.MODE_PRIVATE);
+        profileid=preferences.getString("profileid","");
         init();
         toolbar=findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -153,7 +143,6 @@ public class OthersProfile extends AppCompatActivity {
                     addFollow.enqueue(new Callback<String>() {
                         @Override
                         public void onResponse(Call<String> call, Response<String> response) {
-                            if(response.isSuccessful())
                                 addNotifications();
 
                         }
@@ -167,28 +156,6 @@ public class OthersProfile extends AppCompatActivity {
                 }
             }
         });
-
-        //
-//        btn_follow.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (btn_follow.getText().toString().equals("Follow"))
-//                {
-//                    //nenu follow avutunna vaadi userid
-//                    FirebaseDatabase.getInstance().getReference().child("Follow")
-//                            .child(user.getUid())
-//                            .child("following").child(id).setValue(true);
-//
-//                    addNotifications();
-//
-//                    //vaadi followers lo nenu
-//                    FirebaseDatabase.getInstance().getReference().child("Follow")
-//                            .child(id)
-//                            .child("followers").child(user.getUid()).setValue(true);
-//
-//                }
-//            }
-//        });
         btn_following.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -541,12 +508,14 @@ private void getFollowCount()
 
     private void addNotifications()
     {
-        Call<String> call = interfaceAPI.addNotifi(id,profileid,"started following you","",false);
+        Call<String> call = interfaceAPI.addNotifi(id,profileid,"started following you","");
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 if(response.isSuccessful())
                 {
+                    Log.d("Success","OK");
+
                     Toast.makeText(OthersProfile.this,response.body(),Toast.LENGTH_SHORT).show();
                 }
             }

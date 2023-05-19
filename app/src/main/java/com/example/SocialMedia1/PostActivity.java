@@ -9,11 +9,13 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
@@ -31,17 +33,7 @@ import com.example.SocialMedia1.RealPathUtil.RealPathUtil;
 import com.example.SocialMedia1.Retrofit.NetworkUtil;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
+
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -69,31 +61,26 @@ public class PostActivity extends AppCompatActivity {
     Uri postUri;
     String RealpostUri;
 
-    FirebaseUser user;
-    FirebaseAuth auth;
-    DatabaseReference userRef, postRef;
-    StorageReference storageReference;
+
 
     private int counterPost;
     //API
     NetworkUtil networkUtil = new NetworkUtil();
     Retrofit retrofit = networkUtil.getRetrofit();
     InterfaceAPI interfaceAPI = retrofit.create(InterfaceAPI.class);
-    SharedPreferences preferences = getSharedPreferences("PREFS", MODE_PRIVATE);
-    String profileid = preferences.getString("profileid","");
+    String profileid;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
-
+        SharedPreferences preferences = getSharedPreferences("PREFS", MODE_PRIVATE);
+        profileid = preferences.getString("profileid","");
 
         init();
 
-        auth = FirebaseAuth.getInstance();
-        user = auth.getCurrentUser();
-        storageReference = FirebaseStorage.getInstance().getReference().child("Posts");
-        userRef = FirebaseDatabase.getInstance().getReference().child("Users");
-        postRef = FirebaseDatabase.getInstance().getReference().child("Posts");
+
 
 
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -154,7 +141,6 @@ public class PostActivity extends AppCompatActivity {
                 Toast.makeText(this, "No Meme select!!", Toast.LENGTH_SHORT).show();
             } else {
                 // Tạo request body với định dạng form data
-                Log.d("profileUri.getPath()", postUri.getPath());
                 RealpostUri = RealPathUtil.getRealPath(this, postUri);
                 File imageFile = new File(RealpostUri);
                 String idpost = System.currentTimeMillis()+"."+fileExtension(postUri);
@@ -166,69 +152,22 @@ public class PostActivity extends AppCompatActivity {
                 call.enqueue(new Callback<String>() {
                     @Override
                     public void onResponse(Call<String> call, Response<String> response) {
-                        post_url = response.body();
-                        savePostsDataInFirebase(post_url);
-
+                            progressDialog.dismiss();
+                            post_url = response.body();
+                            Log.d("Post URL", post_url);
+                            savePostsDataInFirebase(post_url);
                     }
 
                     @Override
                     public void onFailure(Call<String> call, Throwable t) {
                             progressDialog.dismiss();
                             Toast.makeText(PostActivity.this, "Error"+t.getMessage(), Toast.LENGTH_SHORT).show();
+                            Log.d("Post URL Fail", t.getMessage());
+
                     }
                 });
             }
         }
-//    private void uploadPost()
-//    {
-//        progressDialog=new ProgressDialog(PostActivity.this);
-//        progressDialog.setTitle("New Post");
-//        progressDialog.setCanceledOnTouchOutside(false);
-//        progressDialog.show();
-//        if (postUri == null)
-//        {
-//            Toast.makeText(this, "No Meme select!!", Toast.LENGTH_SHORT).show();
-//        }else
-//        {
-//            final StorageReference sRef=storageReference.child(System.currentTimeMillis()+"."+fileExtension(postUri));
-//            sRef.putFile(postUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//                @Override
-//                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                    sRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//                        @Override
-//                        public void onSuccess(Uri uri) {
-//
-//                            post_url=uri.toString();
-//                            //database
-//
-////                            SharedPreferences.Editor editor=getSharedPreferences("post",MODE_PRIVATE).edit();
-////                            editor.putString("id",postid);
-////                            editor.apply();
-//
-//                            savePostsDataInFirebase(post_url);
-//
-//
-//
-//                        }
-//                    }).addOnFailureListener(new OnFailureListener() {
-//                        @Override
-//                        public void onFailure(@NonNull Exception e) {
-//                            progressDialog.dismiss();
-//                            Toast.makeText(PostActivity.this, "Error"+e.getMessage(), Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
-//                }
-//            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-//                @Override
-//                public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
-//                  double progress=(100*snapshot.getBytesTransferred()/snapshot.getTotalByteCount());
-//                  progressDialog.setMessage("Uploaded "+((int)progress) +"%...");
-//
-//
-//                }
-//            });
-//        }
-//    }
 
     private void init()
     {
@@ -248,27 +187,9 @@ public class PostActivity extends AppCompatActivity {
         return map.getExtensionFromMimeType(contentResolver.getType(uri));
     }
 
-//    private void getData(){
-//        DatabaseReference reference=FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
-//        reference.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                Data data=snapshot.getValue(Data.class);
-//
-//                profileUrl=data.getProfileUrl();
-//                username=data.getUsername();
-//                memer=data.getMemer();
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//    }
 
     private void savePostsDataInFirebase(final String url) {
+        Log.d("url post" , url);
         Call<Integer>  call = interfaceAPI.PostCount();
         call.enqueue(new Callback<Integer>() {
             @Override
@@ -276,6 +197,7 @@ public class PostActivity extends AppCompatActivity {
                 if (response.isSuccessful())
                 {
                     counterPost=response.body();
+
                 }else
                 {
                     counterPost=0;
@@ -301,95 +223,37 @@ public class PostActivity extends AppCompatActivity {
                     SimpleDateFormat format=new SimpleDateFormat("dd-M-yyyy hh:mm a");
                     String currentDate=format.format(date);
 
-                    Call<Posts> newPost = interfaceAPI.newPost(currentDate,url,description.getText().toString(),profileid,profileUrl,member,username,counterPost);
-                    newPost.enqueue(new Callback<Posts>() {
+                    Call<String> newPost = interfaceAPI.newPost(currentDate,url,description.getText().toString(),profileid,profileUrl,member,username,counterPost);
+                    newPost.enqueue(new Callback<String>() {
                         @Override
-                        public void onResponse(Call<Posts> call, Response<Posts> response) {
+                        public void onResponse(Call<String> call, Response<String> response) {
                         progressDialog.dismiss();
-                        Toast.makeText(PostActivity.this, "New post added!!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(PostActivity.this, "New post added!!", Toast.LENGTH_LONG).show();
                         startActivity(new Intent(PostActivity.this,HomeActivity.class));
+                        Log.d("New post added!!","Success");
                         }
 
                         @Override
-                        public void onFailure(Call<Posts> call, Throwable t) {
+                        public void onFailure(Call<String> call, Throwable t) {
                             progressDialog.dismiss();
-                            Toast.makeText(PostActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(PostActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+//                            startActivity(new Intent(PostActivity.this,HomeActivity.class));
+                            Log.d("New post!!",t.getMessage());
+
                         }
                     });
                 }
             }
-
             @Override
             public void onFailure(Call<Data> call, Throwable t) {
                 Toast.makeText(PostActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.d("New post!!",t.getMessage());
+
             }
         });
 
-    }
+    };
 
-//    private void savePostsDataInFirebase(final String url)
-//    {
-//        postRef.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                if (snapshot.exists())
-//                {
-//                    counterPost=snapshot.getChildrenCount();
-//                }else
-//                {
-//                    counterPost=0;
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//
-//
-//        userRef.child(user.getUid()).addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                if (snapshot.exists())
-//                {
-//                    String n=snapshot.child("username").getValue().toString();
-//                    String m=snapshot.child("memer").getValue().toString();
-//                    String p=snapshot.child("profileUrl").getValue().toString();
-//
-//                    Date date=new Date();
-//                    SimpleDateFormat format=new SimpleDateFormat("dd-M-yyyy hh:mm a");
-//                    String currentDate=format.format(date);
-//
-//                    String postid=postRef.push().getKey();
-//                    HashMap<String,Object> map=new HashMap<>();
-//                    map.put("date",currentDate);
-//                    map.put("postid",postid);
-//                    map.put("postImage",url);
-//                    map.put("description",description.getText().toString());
-//                    map.put("publisher",user.getUid());
-//                    map.put("profile",p);
-//                    map.put("memer",m);
-//                    map.put("username",n);
-//                    map.put("counterPost",counterPost);
-//
-//                    postRef.child(postid).updateChildren(map);
-//
-//                    progressDialog.dismiss();
-//
-//                    Toast.makeText(PostActivity.this, "New post added!!", Toast.LENGTH_SHORT).show();
-//                    startActivity(new Intent(PostActivity.this,HomeActivity.class));
-//
-//
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//    }
     
     
 }

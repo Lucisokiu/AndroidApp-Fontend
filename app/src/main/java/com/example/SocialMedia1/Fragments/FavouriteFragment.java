@@ -24,10 +24,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 import com.example.SocialMedia1.Retrofit.NetworkUtil;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,9 +37,7 @@ public class FavouriteFragment extends Fragment {
     List<Posts> mPost_save;
     PhotosAdapter adapter;
 
-    FirebaseAuth auth;
-    FirebaseUser user;
-    DatabaseReference reference;
+
 
     //API
     NetworkUtil networkUtil = new NetworkUtil();
@@ -65,12 +60,10 @@ public class FavouriteFragment extends Fragment {
 
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("PREFS", Context.MODE_PRIVATE);
 
-        profileid = sharedPreferences.getString("uid", "");
+        profileid = sharedPreferences.getString("profileid", "");
         Log.d("uid-favourite" ,profileid);
 
-        auth=FirebaseAuth.getInstance();
-        user=auth.getCurrentUser();
-        reference=FirebaseDatabase.getInstance().getReference().child("Users");
+
 
 
         recyclerView_save=view.findViewById ( R.id.recyclerView );
@@ -88,21 +81,32 @@ public class FavouriteFragment extends Fragment {
     private void Saved() {
         mySaves = new ArrayList<>();
 
-        Call<List<FavouriteModel>> getFav = interfaceAPI.getFavourite(profileid);
-        getFav.enqueue(new Callback<List<FavouriteModel>>() {
+        Call<List<Posts>> getFav = interfaceAPI.PostFavourite(profileid);
+        getFav.enqueue(new Callback<List<Posts>>() {
             @Override
-            public void onResponse(Call<List<FavouriteModel>> call, Response<List<FavouriteModel>> response) {
+            public void onResponse(Call<List<Posts>> call, Response<List<Posts>> response) {
                 if(response.isSuccessful()) {
-                    favouriteList = response.body();
-                    Log.d("favouriteModelList:", favouriteList.toString());
-                    readSaves();
+                    if (response.body() == null)
+                    {
+
+                    }else {
+                        for (Posts posts : response.body())
+                        mPost_save.add(posts);
+                        adapter.notifyDataSetChanged();
+
+                    }
+//                    favouriteList = response.body();
+//                    Log.d("favouriteModelList:", favouriteList.toString());
+//                            mPost_save.addAll(response.body());
+//                    adapter.notifyDataSetChanged();
 
                 }
+//                    readSaves();
 
             }
 
             @Override
-            public void onFailure(Call<List<FavouriteModel>> call, Throwable t) {
+            public void onFailure(Call<List<Posts>> call, Throwable t) {
                 Log.e("Lỗi-Favouritèagment-Saved()", t.getMessage());
             }
         });
@@ -129,29 +133,32 @@ public class FavouriteFragment extends Fragment {
 
 
 
-    private void readSaves() {
-            Call<List<Posts>> listPost = interfaceAPI.getPost();
-            listPost.enqueue(new Callback<List<Posts>>() {
-                @Override
-                public void onResponse(Call<List<Posts>> call, Response<List<Posts>> response) {
-                    if (response.isSuccessful()) {
-                        for (Posts posts : response.body()) {
-                            for (String id : mySaves) {
-                                if (posts.getPostid().equals(id)) {
-                                    mPost_save.add(posts);
-                                }
-                            }
-                        }
-                        adapter.notifyDataSetChanged();
+//    private void readSaves() {
+//            Call<List<Posts>> listPost = interfaceAPI.getPost();
+//            listPost.enqueue(new Callback<List<Posts>>() {
+//                @Override
+//                public void onResponse(Call<List<Posts>> call, Response<List<Posts>> response) {
+//                    if (response.isSuccessful()) {
+//                        for (Posts posts : response.body()) {
+//                            for (String id : mySaves) {
+//                                if (posts.getPostid().equals(id)) {
+//                                    mPost_save.add(posts);
+//                                }
+//                            }
+//                        }
+//                        adapter.notifyDataSetChanged();
+//
+//                    }
+//                }
+//                @Override
+//                public void onFailure(Call<List<Posts>> call, Throwable t) {
+//                    Log.e("Lỗi-Favouritèagment-readSaves():", t.getMessage());
+//                }
+//            });
+//    }
 
-                    }
-                }
-                @Override
-                public void onFailure(Call<List<Posts>> call, Throwable t) {
-                    Log.e("Lỗi-Favouritèagment-readSaves():", t.getMessage());
-                }
-            });
-    }
+
+
 //        DatabaseReference reference= FirebaseDatabase.getInstance ().getReference ().child ( "Posts" );
 //
 //        reference.addValueEventListener ( new ValueEventListener() {

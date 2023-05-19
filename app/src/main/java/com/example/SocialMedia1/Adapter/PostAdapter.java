@@ -34,13 +34,7 @@ import SocialMedia1.R;
 import com.example.SocialMedia1.Retrofit.NetworkUtil;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -118,7 +112,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
         isLiked(list.getPostid(),holder.like);
         getLikesCount(holder.likes_count,list.getPostid());
+
         isSaved(list.getPostid(),holder.save);
+
         getCommentsCount(holder.comments_count,list.getPostid());
 
         holder.options.setOnClickListener(new View.OnClickListener() {
@@ -201,7 +197,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 //                    FirebaseDatabase.getInstance().getReference().child("Likes")
 //                            .child(list.getPostid())
 //                            .child(profileid).setValue(true);
-                    Call<String> call = interfaceAPI.addLike(list.getPostid(),profileid);
+                    Call<String> call = interfaceAPI.addLike(profileid,list.getPostid());
                     call.enqueue(new Callback<String>() {
                         @Override
                         public void onResponse(Call<String> call, Response<String> response) {
@@ -210,12 +206,24 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
                         @Override
                         public void onFailure(Call<String> call, Throwable t) {
+                            Log.e("Throwable",t.getMessage());
 
                         }
                     });
                 }else
                 {
                     Call<String> call = interfaceAPI.unLike(list.getPublisher(),list.getPostid());
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
 //                    FirebaseDatabase.getInstance().getReference().child("Likes")
 //                            .child(list.getPostid())
 //                            .child(profileid).removeValue();
@@ -230,6 +238,17 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 if (holder.save.getTag().equals("save"))
                 {
                     Call<String> call = interfaceAPI.addFavor(profileid,list.getPostid());
+                    call.enqueue(new Callback<String>() {
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<String> call, Throwable t) {
+
+                        }
+                    });
 //                    FirebaseDatabase.getInstance().getReference().child("Favourites")
 //                            .child(profileid)
 //                            .child(list.getPostid())
@@ -237,7 +256,17 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 }else
                 {
                     Call<String> call = interfaceAPI.unFavor(profileid,list.getPostid());
+                    call.enqueue(new Callback<String>() {
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
 
+                        }
+
+                        @Override
+                        public void onFailure(Call<String> call, Throwable t) {
+
+                        }
+                    });
 //                    FirebaseDatabase.getInstance().getReference().child("Favourites")
 //                            .child(profileid)
 //                            .child(list.getPostid())
@@ -376,19 +405,17 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             public void onResponse(Call<List<LikeModel>> call, Response<List<LikeModel>> response) {
                 if(response.isSuccessful())
                 {
-                    Log.d("isLike:", response.body().toString());
-                    Log.d("profileid:", profileid);
-
-                    if (response.body().contains(profileid)) {
+//                    Log.d("isLike:", response.body().toString());
+//                    Log.d("profileid:", profileid);
+                for(LikeModel likeModel : response.body())
+                    if (likeModel.equals(profileid)) {
                         imageView.setImageResource(R.drawable.ic_liked);
                         imageView.setTag("Liked");
-                        Log.d("OKKKKKKKKKKKKKKKKKKKKKK Liked:", response.body().toString());
 
                     }else
                     {
                         imageView.setImageResource(R.drawable.ic_like);
                         imageView.setTag("Like");
-                        Log.d("OKKKKKKKKKKKKKKKKKKKKKK Like:", response.body().toString());
                     }
                 }
             }
@@ -430,7 +457,19 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     private void addNotifications(String userid,String postid)
     {
 
-        Call<String> call = interfaceAPI.addNotifi(userid,profileid,"liked your post",postid,true);
+
+        Call<String> call = interfaceAPI.addNotifi(userid,profileid,"liked your post",postid);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Log.d("Success","OK");
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
 //        FirebaseUser user=FirebaseAuth.getInstance().getCurrentUser();
 //        DatabaseReference reference=FirebaseDatabase.getInstance().getReference().child("Notifications").child(userid);
 //
@@ -515,26 +554,37 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     private void isSaved(final String postid,final ImageView imageView)
     {
-        Call<List<FavouriteModel>> call = interfaceAPI.getFavourite(postid);
-        call.enqueue(new Callback<List<FavouriteModel>>() {
+
+        Call<List<Posts>> call = interfaceAPI.getFavourite(profileid);
+        call.enqueue(new Callback<List<Posts>>() {
             @Override
-            public void onResponse(Call<List<FavouriteModel>> call, Response<List<FavouriteModel>> response) {
-                if(response.isSuccessful())
-                {
-                    if (response.body().contains(postid)) {
-                        imageView.setImageResource(R.drawable.ic_saved);
-                        imageView.setTag("saved");
-                    }else
-                    {
+            public void onResponse(Call<List<Posts>> call, Response<List<Posts>> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() == null) {
                         imageView.setImageResource(R.drawable.ic_save);
                         imageView.setTag("save");
+                    } else {
+                        for (Posts posts : response.body()) {
+                            if (posts.getPostid().equals(postid)) {
+                                Log.d("postid", posts.getPostid());
+                                imageView.setImageResource(R.drawable.ic_saved);
+                                imageView.setTag("saved");
+                            } else {
+                                Log.d("save", "OK");
+                                imageView.setImageResource(R.drawable.ic_save);
+                                imageView.setTag("save");
+                            }
+
+                        }
                     }
                 }
             }
 
             @Override
-            public void onFailure(Call<List<FavouriteModel>> call, Throwable t) {
+            public void onFailure(Call<List<Posts>> call, Throwable t) {
                 Toast.makeText(context, t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("isSave", t.getMessage());
+
             }
         });
 
@@ -614,9 +664,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         call.enqueue(new Callback<Data>() {
             @Override
             public void onResponse(Call<Data> call, Response<Data> response) {
-                username.setText(response.body().getUsername());
-                memer.setText(response.body().getMemer());
-                Picasso.get().load(response.body().getProfileUrl()).into(profile);
+                if(response.isSuccessful()) {
+                    username.setText(response.body().getUsername());
+                    memer.setText(response.body().getMemer());
+                    Picasso.get().load(response.body().getProfileUrl()).into(profile);
+                }
             }
 
             @Override

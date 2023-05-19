@@ -16,13 +16,7 @@ import com.example.SocialMedia1.API.InterfaceAPI;
 import com.example.SocialMedia1.Adapter.NotificationAdapter;
 import com.example.SocialMedia1.Model.Notifications;
 import com.example.SocialMedia1.Retrofit.NetworkUtil;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,14 +40,14 @@ public class NotificationActivity extends AppCompatActivity {
     Retrofit retrofit = networkUtil.getRetrofit();
     InterfaceAPI interfaceAPI = retrofit.create(InterfaceAPI.class);
 
-    SharedPreferences preferences = getSharedPreferences("PREFS", MODE_PRIVATE);
-    String id = preferences.getString("profileid","");
+    String id;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
 
-
+        SharedPreferences preferences = getSharedPreferences("PREFS", MODE_PRIVATE);
+        id = preferences.getString("profileid","");
 
         toolbar=findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -80,7 +74,11 @@ public class NotificationActivity extends AppCompatActivity {
         call.enqueue(new Callback<List<Notifications>>() {
             @Override
             public void onResponse(Call<List<Notifications>> call, Response<List<Notifications>> response) {
-                list.addAll(response.body());
+                for(Notifications notifications : response.body()) {
+                    list.add(notifications);
+                    Collections.reverse(list);
+                    adapter.notifyDataSetChanged();
+                }
                 Collections.reverse(list);
                 adapter.notifyDataSetChanged();
             }

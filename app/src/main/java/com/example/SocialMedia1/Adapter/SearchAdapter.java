@@ -3,6 +3,7 @@ package com.example.SocialMedia1.Adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,13 +22,7 @@ import com.example.SocialMedia1.OthersProfile;
 import SocialMedia1.R;
 
 import com.example.SocialMedia1.Retrofit.NetworkUtil;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -87,6 +82,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
             }
         });
 
+//        isFollowing(data.getUser_id(), holder.btn_follow, holder.btn_following);
 
         if (profileid.equals(data.getUser_id())) {
             holder.btn_follow.setVisibility(View.GONE);
@@ -95,26 +91,26 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         {
             holder.btn_follow.setVisibility(View.VISIBLE);
             holder.btn_following.setVisibility(View.VISIBLE);
+            isFollowing(data.getUser_id(), holder.btn_follow, holder.btn_following);
+
         }
-        isFollowing(dataList.get(position).getUser_id(), holder.btn_follow, holder.btn_following);
 
         holder.btn_follow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (holder.btn_follow.getText().toString().equals("Follow")) {
-
-                    Call<String> call = interfaceAPI.addFavor(profileid,data.getUser_id());
+                    Call<String> call = interfaceAPI.addFollow(profileid,data.getUser_id());
                     call.enqueue(new Callback<String>() {
                         @Override
                         public void onResponse(Call<String> call, Response<String> response) {
-                            if(response.isSuccessful())
-                            {
+//                            Log.d("data.getUser_id()", data.getUser_id());
                                 addNotifications(data.getUser_id());
-                            }
+
                         }
 
                         @Override
                         public void onFailure(Call<String> call, Throwable t) {
+                            Log.d("Throwable",t.getMessage());
 
                         }
                     });
@@ -141,6 +137,17 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
                 if (holder.btn_following.getText().toString().equals("Following")) {
 
                     Call<String> call = interfaceAPI.unFollow(profileid,data.getUser_id());
+                    call.enqueue(new Callback<String>() {
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
+//                            addNotifications(data.getUser_id());
+                        }
+
+                        @Override
+                        public void onFailure(Call<String> call, Throwable t) {
+
+                        }
+                    });
 //                    FirebaseDatabase.getInstance().getReference().child("Follow")
 //                            .child(user.getUid())
 //                            .child("following").child(dataList.get(position).getUser_id()).removeValue();
@@ -188,14 +195,14 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
             public void onResponse(Call<List<FollowingModel>> call, Response<List<FollowingModel>> response) {
                 if(response.isSuccessful())
                 {
-                    if(response.body().contains(userid)){
-                        follow.setVisibility(View.GONE);
-                        following.setVisibility(View.VISIBLE);
-                    } else {
-                        follow.setVisibility(View.VISIBLE);
-                        following.setVisibility(View.GONE);
+                    follow.setVisibility(View.VISIBLE);
+                    following.setVisibility(View.GONE);
+                    for(FollowingModel followingModel : response.body()) {
+                        if (userid.equals(followingModel.getId())) {
+                            follow.setVisibility(View.GONE);
+                            following.setVisibility(View.VISIBLE);
+                        }
                     }
-
                 }
             }
 
@@ -231,7 +238,20 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     private void addNotifications(String userid)
     {
 
-        Call<String> call = interfaceAPI.addNotifi(userid,profileid,"started following you","",false);
+        Call<String> call = interfaceAPI.addNotifi(userid,profileid,"started following you","");
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Log.d("Notifi added!!!","OK");
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e("Throwable",t.getMessage());
+
+            }
+        });
 
     }
 //        FirebaseUser user=FirebaseAuth.getInstance().getCurrentUser();

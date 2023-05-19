@@ -21,11 +21,7 @@ import com.example.SocialMedia1.PostDetails;
 import SocialMedia1.R;
 
 import com.example.SocialMedia1.Retrofit.NetworkUtil;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

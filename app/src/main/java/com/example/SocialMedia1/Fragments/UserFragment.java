@@ -55,17 +55,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
+
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -95,12 +85,10 @@ public class UserFragment extends Fragment {
     List<Posts> postsList;
     PhotosAdapter adapter;
 
-    FirebaseAuth auth;
-    FirebaseUser user;
+
     String profileid;
 
-    DatabaseReference reference;
-    StorageReference storageReference,bgRef;
+
     Uri profileUri,bgUri;
     String RealpostUriProfile, RealpostUriBackground;
 
@@ -123,7 +111,7 @@ public class UserFragment extends Fragment {
 
         SharedPreferences preferences=getContext().getSharedPreferences("PREFS", Context.MODE_PRIVATE);
         profileid=preferences.getString("profileid","");
-
+        Log.d("profileid", profileid);
         init(view);
 
 //        auth=FirebaseAuth.getInstance();
@@ -190,7 +178,17 @@ public class UserFragment extends Fragment {
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                auth.signOut();
+
+                SharedPreferences preferences=getContext().getSharedPreferences("PREFS", Context.MODE_PRIVATE);
+
+                // Lấy đối tượng SharedPreferences.Editor
+                SharedPreferences.Editor editor = preferences.edit();
+
+                // Xóa toàn bộ dữ liệu trong SharedPreferences
+                editor.clear();
+
+                // Áp dụng các thay đổi
+                editor.apply();
                 startActivity(new Intent(getActivity(), Login.class)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK));
             }
@@ -199,7 +197,7 @@ public class UserFragment extends Fragment {
         profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                CheckPermission_forProfile();
+                CheckPermission_forProfile();
                 Intent intent=new Intent(Intent.ACTION_PICK);
                 intent.setType("image/*");
                 startActivityForResult(intent,1);
@@ -209,7 +207,7 @@ public class UserFragment extends Fragment {
         bg_camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                CheckPermission_forBg();
+                    CheckPermission_forBg();
                     Intent intent=new Intent(Intent.ACTION_PICK);
                     intent.setType("image/*");
                     startActivityForResult(intent,2);
@@ -220,7 +218,6 @@ public class UserFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-//                CheckPermission_forProfile();
                 uploadProfile();
 
             }
@@ -230,7 +227,6 @@ public class UserFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 updateBackground();
-//                CheckPermission_forBg();
             }
         });
 
@@ -275,7 +271,7 @@ public class UserFragment extends Fragment {
                     @Override
                     public void onResponse(Call<String> call, Response<String> response) {
                         pd.dismiss();
-                        Toast.makeText(getContext(), "Profiled updated", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Profiled updated", Toast.LENGTH_LONG).show();
                         btn_update.setVisibility(View.GONE);
                     }
 
@@ -283,7 +279,7 @@ public class UserFragment extends Fragment {
                     public void onFailure(Call<String> call, Throwable t) {
                         pd.dismiss();
                         btn_update.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), "Something went wrong!!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Something went wrong!!", Toast.LENGTH_LONG).show();
                         Log.e("Error at UploadProfile ", t.getMessage());
                     }
                 });
@@ -298,11 +294,9 @@ public class UserFragment extends Fragment {
         pd.setTitle("Background image");
         pd.setCanceledOnTouchOutside(false);
         pd.show();
-        if (profileUri !=null) {
+        if (bgUri !=null) {
             // Tạo request body với định dạng form data
-            Log.d("profileUri.getPath()",profileUri.getPath());
             RealpostUriBackground = RealPathUtil.getRealPath(getContext(), profileUri);
-
             File imageFile = new File(RealpostUriBackground);
 
             RequestBody requestBody = RequestBody.create(MediaType.parse(getFileExtension(profileUri)), imageFile);
@@ -323,6 +317,7 @@ public class UserFragment extends Fragment {
                     pd.dismiss();
                     u_bg.setVisibility(View.VISIBLE);
                     Toast.makeText(getContext(), "Something went wrong!!", Toast.LENGTH_SHORT).show();
+                    Log.e("Error at updateBackground ", t.getMessage());
                 }
             });
         }else {
@@ -377,7 +372,7 @@ public class UserFragment extends Fragment {
 
     private void getUserData()
     {
-        Log.d("profileid",profileid);
+//        Log.d("profileid",profileid);
 
         Call<Data> call = interfaceAPI.getUser(profileid);
         call.enqueue(new Callback<Data>() {
@@ -394,10 +389,11 @@ public class UserFragment extends Fragment {
                 username.setText(n);
                 memer.setText(m);
                 Picasso.get().load(p).placeholder(R.drawable.profile_image).into(profile);
-                Picasso.get().load(b).into(bg);
+                Picasso.get().load(b).placeholder(R.drawable.profile_image).into(bg);
 
 
-                Glide.with(getActivity()).load(p).centerCrop().placeholder(R.drawable.profile_image).into(profile);
+//                Glide.with(getActivity()).load(p).centerCrop().placeholder(R.drawable.profile_image).into(profile);
+//                Glide.with(getActivity()).load(b).centerCrop().placeholder(R.drawable.profile_image).into(bg);
 
             }
 

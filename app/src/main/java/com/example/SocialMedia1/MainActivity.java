@@ -18,11 +18,6 @@ import com.example.SocialMedia1.Model.RegisterModel;
 import com.example.SocialMedia1.Retrofit.NetworkUtil;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -43,9 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
     Random random;
 
-    FirebaseAuth auth;
-    FirebaseUser user;
-    DatabaseReference reference;
+
 //
 //    String url="https://firebasestorage.googleapis.com/v0/b/signin-function.appspot.com/o/download.jpg?alt=media&token=143d5e9d-c652-465d-b513-6ee75537ad11";
 //
@@ -64,9 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
         init();
 
-        auth=FirebaseAuth.getInstance();
-        user=auth.getCurrentUser();
-        reference= FirebaseDatabase.getInstance().getReference().child("Users");
+
 
 
 

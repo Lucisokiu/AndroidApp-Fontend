@@ -13,8 +13,8 @@
         android:fontFamily="@font/bungee_shade"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        android:text="Mạng xa"
-        android:textColor="#FFEB3B"
+        android:text="Mạng Xã Hội"
+        android:textColor="#FFFF"
         android:textSize="28sp"
         android:textStyle="bold" />
 

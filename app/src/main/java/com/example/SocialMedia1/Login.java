@@ -21,10 +21,7 @@ import com.example.SocialMedia1.Retrofit.NetworkUtil;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
@@ -40,16 +37,13 @@ import retrofit2.Retrofit;
 
 public class Login extends AppCompatActivity {
     Button sign;
-    GoogleSignInClient googleSignInClient;
     TextView goToSignUp;
 
     EditText email,password;
     Button login;
     ProgressDialog progressDialog;
 
-    FirebaseAuth auth;
-    FirebaseUser user;
-//    private SessionManagement sessionManagement;
+
 
     private NetworkUtil networkUtil;
     private Retrofit retrofit;
@@ -104,13 +98,11 @@ public class Login extends AppCompatActivity {
                             {
                                 Intent intent=new Intent(Login.this,HomeActivity.class);
                                 String uid = response.body().getUid();
-//                                intent.putExtra("uid",uid);
-//                                Log.d("uid user", response.body().getUid());
+
 
 
                                 SharedPreferences sharedPreferences = getSharedPreferences("PREFS", MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
-//                                SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
                                 Call<Data> calluser = interfaceAPI.getUser(uid);
                                 calluser.enqueue(new Callback<Data>() {
                                     @Override
@@ -145,24 +137,6 @@ public class Login extends AppCompatActivity {
                             progressDialog.dismiss();
                         }
                     });
-
-
-//                    auth.signInWithEmailAndPassword(e,p).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<AuthResult> task) {
-//
-//                            if (task.isSuccessful())
-//                            {
-//                                startActivity(new Intent(Login.this,HomeActivity.class));
-//                                Toast.makeText(Login.this, "Login success...", Toast.LENGTH_SHORT).show();
-//                                progressDialog.dismiss();
-//                            }else
-//                            {
-//                                Toast.makeText(Login.this, "Failed to login "+task.getException(), Toast.LENGTH_SHORT).show();
-//                                progressDialog.dismiss();
-//                            }
-//                        }
-//                    });
                 }
             }
         });
@@ -180,7 +154,6 @@ public class Login extends AppCompatActivity {
 
     private void init()
     {
-        sign=findViewById(R.id.signIn);
         goToSignUp=findViewById(R.id.goToSignUp);
         email=findViewById(R.id.email);
         password=findViewById(R.id.password);

@@ -32,13 +32,7 @@ import SocialMedia1.R;
 
 import com.example.SocialMedia1.Retrofit.NetworkUtil;
 import com.example.SocialMedia1.SearchUsers;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -64,14 +58,10 @@ public class FollowingFragment extends Fragment {
     ImageView post_one, note, active;
     TextView no;
     Button discover;
+    String uid;
 
 
-    FirebaseAuth auth;
-    FirebaseUser user;
-
-    DatabaseReference reference;
-
-    List<String> followingList;
+    List<FollowingModel> followingList;
 
     private NetworkUtil networkUtil;
     private Retrofit retrofit;
@@ -90,6 +80,7 @@ public class FollowingFragment extends Fragment {
 
         SharedPreferences prefs = getActivity().getSharedPreferences("PREFS", MODE_PRIVATE);
         profileid = prefs.getString("profileid", "");
+        Log.d("profileid", profileid);
 
         profile = view.findViewById(R.id.profile_image);
         search = view.findViewById(R.id.search);
@@ -104,10 +95,7 @@ public class FollowingFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        auth = FirebaseAuth.getInstance();
-        user = auth.getCurrentUser();
 
-        reference = FirebaseDatabase.getInstance().getReference().child("Users");
 
         postsList = new ArrayList<>();
         adapter = new PostAdapter(getActivity(), postsList);
@@ -132,25 +120,25 @@ public class FollowingFragment extends Fragment {
         });
 
 
-        reference.child(profileid).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    Log.d("áds" , snapshot.toString());
-                    String p = snapshot.child("profileUrl").getValue().toString();
-
-                    Picasso.get().load(p).placeholder(R.drawable.profile_image).into(profile);
-                } else {
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getActivity(), "Error " + error.getMessage(), Toast.LENGTH_SHORT).show();
-
-            }
-        });
+//        reference.child(profileid).addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if (snapshot.exists()) {
+//                    Log.d("áds" , snapshot.toString());
+//                    String p = snapshot.child("profileUrl").getValue().toString();
+//
+//                    Picasso.get().load(p).placeholder(R.drawable.profile_image).into(profile);
+//                } else {
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//                Toast.makeText(getActivity(), "Error " + error.getMessage(), Toast.LENGTH_SHORT).show();
+//
+//            }
+//        });
 
 
         clicks();
@@ -200,9 +188,7 @@ public class FollowingFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), OthersProfile.class);
-                Bundle bundle = getActivity().getIntent().getExtras();
-                String uid = bundle.getString("uid");
-                intent.putExtra("uid", uid);
+                intent.putExtra("uid", profileid);
                 startActivity(intent);
             }
         });
@@ -218,18 +204,12 @@ public class FollowingFragment extends Fragment {
 
         followingList = new ArrayList<>();
 
-        Call<FollowModel> followModelCall = interfaceAPI.getFollow(profileid);
-        followModelCall.enqueue(new Callback<FollowModel>() {
+        Call<List<FollowingModel>> followModelCall = interfaceAPI.getFollowing(profileid);
+        followModelCall.enqueue(new Callback<List<FollowingModel>>() {
             @Override
-            public void onResponse(Call<FollowModel> call, Response<FollowModel> response) {
+            public void onResponse(Call<List<FollowingModel>> call, Response<List<FollowingModel>> response) {
                 if (response.isSuccessful()) {
-                    FollowModel followModel = response.body();
-                    Log.d("followModel", followModel.toString());
-//                    String following = followModel;
-//                    Log.d("following ", following);
-                    FollowingModel followingModel = followModel.getFollowing();
-
-                    followingList.add(followingModel.getId());
+                    followingList.addAll(response.body());
                     getPosts();
                     no.setVisibility(View.GONE);
                     discover.setVisibility(View.GONE);
@@ -241,7 +221,7 @@ public class FollowingFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<FollowModel> call, Throwable t) {
+            public void onFailure(Call<List<FollowingModel>> call, Throwable t) {
                 Log.d("lỗi login", "đây : " + t.getMessage());
 
             }
@@ -287,9 +267,10 @@ public class FollowingFragment extends Fragment {
 //                for ( Posts posts : response.body()) {
 //                    postsList.add(posts);
 //                }
-                for (String id : followingList) {
+                for (FollowingModel followingModel : followingList) {
                     for ( Posts posts : response.body()) {
-                        if (posts.getPublisher().equals(id)) {
+                        if (posts.getPublisher().equals(followingModel.getId())) {
+                            Log.d("id Following",followingModel.getId());
 
                             postsList.add(posts);
                         }

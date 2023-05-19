@@ -1,6 +1,7 @@
 package com.example.SocialMedia1.API;
 
 
+import com.example.SocialMedia1.Model.Comment;
 import com.example.SocialMedia1.Model.Data;
 import com.example.SocialMedia1.Model.FavouriteModel;
 import com.example.SocialMedia1.Model.FollowModel;
@@ -64,11 +65,14 @@ public interface InterfaceAPI {
     @GET("api/Posts")
     Call<List<Posts>> getPost();
 
-
-
     @POST("api/Favourite")
     @FormUrlEncoded
-    Call<List<FavouriteModel>> getFavourite(
+    Call<List<Posts>> PostFavourite(
+            @Field("uid") String uid);
+
+    @POST("api/favourite")
+    @FormUrlEncoded
+    Call<List<Posts>> getFavourite(
             @Field("uid") String uid);
 
     @POST("api/uploadProfile")
@@ -76,7 +80,7 @@ public interface InterfaceAPI {
     Call<String> uploadProfile(
             @Part MultipartBody.Part image);
 
-    @POST("api/uploadPostImage")
+    @POST("api/uploadPosts")
     @Multipart
     Call<String> uploadPostImage(
             @Part MultipartBody.Part image);
@@ -91,19 +95,18 @@ public interface InterfaceAPI {
     Call<List<FollowerModel>> getFollowers(
             @Field("uid") String uid);
 
-    @POST("api/Follow/followers")
+    @POST("api/PostDetail")
     @FormUrlEncoded
     Call<Posts> getPostDetail(
             @Field("postid") String postid);
 
     @GET("api/PostCount")
-    @FormUrlEncoded
     Call<Integer> PostCount();
 
 
     @POST("api/NewPost")
     @FormUrlEncoded
-    Call<Posts> newPost(
+    Call<String> newPost(
             @Field("date") String date,
             @Field("postImage") String postImage,
             @Field("description") String description,
@@ -129,16 +132,16 @@ public interface InterfaceAPI {
     @POST("api/addNotifi")
     @FormUrlEncoded
     Call<String> addNotifi(
-            @Field("uid") String uid,
-            @Field("userid") String userid,
+            @Field("uid") String uid, // người sẽ nhận được thông báo
+            @Field("userid") String userid, // người tạo thông báo
             @Field("comment") String comment,
-            @Field("postid") String postid,
-            @Field("ispost") boolean ispost);
+            @Field("postid") String postid);
+//            @Field("ispost") boolean ispost);
 
     @POST("api/getNotifi")
     @FormUrlEncoded
     Call<List<Notifications>> getNotifi(
-            @Field("postid") String postid);
+            @Field("uid") String uid);
 
     @POST("api/islike")
     @FormUrlEncoded
@@ -159,13 +162,13 @@ public interface InterfaceAPI {
             @Field("postid") String postid);
 
 
-    @POST("api/addFavor")
+    @POST("api/addfavourite")
     @FormUrlEncoded
     Call<String> addFavor(
             @Field("uid") String profileid,
             @Field("postid") String postid);
 
-    @POST("api/unFavor")
+    @POST("api/unfavourite")
     @FormUrlEncoded
     Call<String> unFavor(
             @Field("uid") String profileid,
@@ -175,4 +178,19 @@ public interface InterfaceAPI {
     @FormUrlEncoded
     Call<String> commentCount(
             @Field("postid") String postid);
+
+    @POST("api/getComment")
+    @FormUrlEncoded
+    Call<List<Comment>> getComments(
+            @Field("postid") String postid);
+
+
+    @POST("api/addComment")
+    @FormUrlEncoded
+    Call<String> addComment(
+            @Field("comment") String comment,
+            @Field("publisher") String publisher,
+            @Field("time") String time);
+
+
 }
